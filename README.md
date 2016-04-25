@@ -10,6 +10,8 @@ This assumes you are connected to a campus/organization network that utilizes La
     $ node server.js
 
 ## Routes
+The actual data in the sample responses are not necessarily accurate (e.g. Speare Hall East obviously has more than 4 machines). The sample responses are meant to highlight the structure.
+
 `GET /laundry`
 
 Returns a JSON response of all laundry rooms on campus, mapping the laundry room's ID to its name
@@ -30,22 +32,29 @@ Returns a JSON response containing the statuses of all laundry machines in a par
 #### Sample Response
 ```json
 {
-  "144 HEMENWAY ST": {
-    "1": {
+  "location": "SPEARE HALL EAST",
+  "washers": 2,
+  "dryers": 2,
+  "total_machines": 4,
+  "available_washers": 0,
+  "available_dryers": 1,
+  "out_of_service": 1,
+  "machines": {
+    "10": {
       "type": "dryer",
-      "status": "available"
+      "status": "cycle ended 5 minutes ago"
     },
-    "2": {
+    "11": {
       "type": "washer",
-      "status": "available"
+      "status": "est. time remaining 39 min"
     },
-    "3": {
+    "12": {
+      "type": "washer",
+      "status": "est. time remaining 40 min"
+    },
+    "13": {
       "type": "dryer",
       "status": "out of service"
-    },
-    "4": {
-      "type": "washer",
-      "status": "est. time remaining 33 min"
     }
   }
 }
