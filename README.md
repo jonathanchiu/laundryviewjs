@@ -50,3 +50,6 @@ Returns a JSON response containing the statuses of all laundry machines in a par
   }
 }
 ```
+
+## License
+MIT
