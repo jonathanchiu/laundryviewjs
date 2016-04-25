@@ -51,5 +51,12 @@ Returns a JSON response containing the statuses of all laundry machines in a par
 }
 ```
 
+## TODO
+* Better error handling
+* Eventually turn this into or create a API wrapper for this
+* Make routes more RESTful
+* Implement more features
+  * Getting weekly usage statistics for a specific laundry room
+
 ## License
 MIT
