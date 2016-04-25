@@ -19,7 +19,9 @@ function getLaundryRooms() {
 
         // Grab the laundry room's ID from each room's URL
         var roomId    = room.attr('href').replace(/\D/g, '');
-        rooms[roomId] = room.text().trim();
+        rooms[roomId] = {
+          location: room.text().trim()
+        }
         i++;
       });
 
@@ -44,31 +46,61 @@ app.get('/laundry/:id', function(req, res) {
   getLaundryRooms()
     .then(function(response) {
       var rooms    = response;
-      var roomName = rooms[req.params.id];
+      var roomName = rooms[req.params.id].location;
 
       if (roomName) {
         request(ROOM_URL.replace('ROOM_ID', req.params.id))
           .then(function(html) {
 
-            var $              = cheerio.load(html);
-            var statuses       = {}
-            statuses[roomName] = {};
-
+            var $                = cheerio.load(html);
             // Returns an array of laundry machine id DOM elements
-            var machineIds      = $('.desc');
+            var machineIds       = $('.desc');
             // Returns an array of laundry machine image DOM elements
-            var machineTypes    = $('img', '.bgicon');
+            var machineTypes     = $('img', '.bgicon');
             // Returns an array of laundry machine status DOM elements
-            var machineStatuses = $('.stat');
+            var machineStatuses  = $('.stat');
+            // LaundryView has a div containing info regarding machine availabilities
+            var availabilities   = $('.monitor-total').text().match(/^\d+|\d+\b|\d+(?=\w)/g);
+            var availableWashers = parseInt(availabilities[0], 10);
+            var availableDryers  = parseInt(availabilities[2], 10);
+
+            var statuses = {
+              location: roomName,
+              washers: 0,
+              dryers: 0,
+              total_machines: 0,
+              available_washers: 0,
+              available_dryers: 0,
+              out_of_service: 0,
+              machines: {}
+            };
+
+            // Determine number of washers, dryers, and out of service machines
+            for (var i = 0; i < machineTypes.length; i++) {
+              var mt = $(machineTypes.get(i)).attr('src');
+              if (mt.indexOf('washer_unavailable') > -1 ||
+                  mt.indexOf('dryer_unavailable') > -1) {
+                statuses.out_of_service++;
+              }
+              else if (mt.indexOf('washer') > -1) {
+                statuses.washers += 1;
+              }
+              else {
+                statuses.dryers += 1;
+              }
+            }
+
+            statuses.available_washers += availableWashers;
+            statuses.available_dryers += availableDryers;
+            statuses.total_machines += (statuses.washers + statuses.dryers);
 
             for (var i = 0; i < machineIds.length; i++) {
-              // Indexing a jQuery object returns the actual DOM element so wrap
-              // the result with another jQuery selector for convenience's sake
               var machineId     = $(machineIds.get(i)).text().trim();
               var machineStatus = $(machineStatuses.get(i)).text().trim();
-              var machineType   = $(machineTypes.get(i)).attr('src').indexOf('washer') > -1 ? 'washer' : 'dryer';
+              var isWasher = $(machineTypes.get(i)).attr('src').indexOf('washer') > -1;
+              var machineType = isWasher ? 'washer' : 'dryer';
 
-              statuses[roomName][machineId] = {
+              statuses['machines'][machineId] = {
                 type: machineType,
                 status: machineStatus
               };
