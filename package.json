@@ -1,0 +1,12 @@
+{
+  "name"              : "laundry-view-api",
+  "version"           : "0.0.1",
+  "description"       : "An API for LaundryView",
+  "main"              : "server.js",
+  "author"            : "Jonathan CHiu",
+  "dependencies"      : {
+    "express"         : "latest",
+    "request-promise" : "latest",
+    "cheerio"         : "latest"
+  }
+}
