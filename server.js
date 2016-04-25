@@ -8,20 +8,16 @@ var ROOM_URL = "http://classic.laundryview.com/laundry_room.php?view=c&lr=ROOM_I
 function getLaundryRooms() {
   return request(HOME_URL)
     .then(function(html) {
-      // Utilize cheerio to 'jQuerify' the returned HTML
+
       var $     = cheerio.load(html);
       var rooms = {};
       var i     = 0;
 
-      // Generate a Javascript object mapping laundry room id to its name
       $('.a-room').each(function() {
-        var room = $(this);
+        var room   = $(this);
+        var roomId = room.attr('href').replace(/\D/g, '');
 
-        // Grab the laundry room's ID from each room's URL
-        var roomId    = room.attr('href').replace(/\D/g, '');
-        rooms[roomId] = {
-          location: room.text().trim()
-        }
+        rooms[roomId] = { location: room.text().trim() }
         i++;
       });
 
@@ -45,8 +41,11 @@ app.get('/laundry', function(req, res) {
 app.get('/laundry/:id', function(req, res) {
   getLaundryRooms()
     .then(function(response) {
-      var rooms    = response;
-      var roomName = rooms[req.params.id].location;
+      var rooms = response;
+
+      if (rooms[req.params.id]) {
+        var roomName = rooms[req.params.id].location;
+      }
 
       if (roomName) {
         request(ROOM_URL.replace('ROOM_ID', req.params.id))
@@ -91,14 +90,14 @@ app.get('/laundry/:id', function(req, res) {
             }
 
             statuses.available_washers += availableWashers;
-            statuses.available_dryers += availableDryers;
-            statuses.total_machines += (statuses.washers + statuses.dryers);
+            statuses.available_dryers  += availableDryers;
+            statuses.total_machines    += (statuses.washers + statuses.dryers);
 
             for (var i = 0; i < machineIds.length; i++) {
               var machineId     = $(machineIds.get(i)).text().trim();
               var machineStatus = $(machineStatuses.get(i)).text().trim();
-              var isWasher = $(machineTypes.get(i)).attr('src').indexOf('washer') > -1;
-              var machineType = isWasher ? 'washer' : 'dryer';
+              var isWasher      = $(machineTypes.get(i)).attr('src').indexOf('washer') > -1;
+              var machineType   = isWasher ? 'washer' : 'dryer';
 
               statuses['machines'][machineId] = {
                 type: machineType,
@@ -108,11 +107,16 @@ app.get('/laundry/:id', function(req, res) {
 
             res.json(statuses);
           })
+          // Something went wrong with the request to laundry room URL
           .catch(function(err) {
             res.send(err);
           });
       }
+      else {
+        res.status(404).send({ error: "Received an invalid laundry room id" });
+      }
     })
+    // Something went wrong with the request to LaundryView home page
     .catch(function(err) {
       res.send(err);
     });
