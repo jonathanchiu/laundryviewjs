@@ -1,7 +1,19 @@
 # laundryviewjs
-A crude and very barebones Node RESTful API for LaundryView
+A crude and very barebones Node RESTful API for [LaundryView](http://www.laundryview.com).
 
-## Setup Notes
+This should (in theory) work across all university campuses that utilize LaundryView.
+
+## Why?
+* LaundryView does not provide an API of any sort
+* I wanted to dabble more with Node and create an API with it
+* I wanted to provide a somewhat useful service (or at least that's my hope) for other developers
+
+## Dependencies
+* express
+* cheerio
+* request
+
+## Setup
 This assumes you are connected to a campus/organization network that utilizes LaundryView as a service. If not, all that will be returned will be dummy data provided by LaundryView.
 
     $ git clone https://github.com/jonathanchiu/laundryviewjs.git
@@ -60,12 +72,14 @@ Returns a JSON response containing the statuses of all laundry machines in a par
 }
 ```
 
+## Info
+[LaundryView](http://www.laundryview.com) is an Internet application that allows you to monitor the status of washers and dryers in connected laundry rooms through a Web browser. LaundryView was developed in response to requests for greater control over laundry activities. Since many people tend to do their laundry during similar time periods, it results in busy laundry rooms. LaundryView's mission is to help you save time by providing information about the current state of laundry room equipment wherever you have access to a browser or e-mail messages.
+
 ## TODO
 * Better error handling
 * Eventually turn this into or create a API wrapper for this
-* Make routes more RESTful
 * Implement more features
-  * Getting weekly usage statistics for a specific laundry room
+  * Get weekly usage statistics for a specific laundry room?
 
 ## License
 MIT
