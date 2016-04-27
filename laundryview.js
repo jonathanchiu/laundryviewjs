@@ -10,7 +10,7 @@ function getLaundryRooms() {
     .then(function(html) {
 
       var $     = cheerio.load(html);
-      var rooms = {};
+      var rooms = { laundry_rooms: 0 };
       var i     = 0;
 
       $('.a-room').each(function() {
@@ -20,6 +20,8 @@ function getLaundryRooms() {
         rooms[roomId] = { location: room.text().trim() }
         i++;
       });
+
+      rooms.laundry_rooms += i;
 
       return rooms;
     })
